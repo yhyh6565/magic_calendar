@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { CalendarEvent } from '../types';
 import { generateGoogleCalendarLink, addToAppleCalendar } from '../utils/dateUtils';
-// @ts-ignore
-import feather from 'feather-icons';
+import { CheckCircle, Calendar, Clock, MapPin, AlignLeft } from 'lucide-react';
 
 interface EventPreviewProps {
   event: CalendarEvent;
@@ -10,17 +9,13 @@ interface EventPreviewProps {
 }
 
 const EventPreview: React.FC<EventPreviewProps> = ({ event, onReset }) => {
-  
-  useEffect(() => {
-    feather.replace();
-  }, []);
 
   const startDate = new Date(event.startDate);
   const endDate = new Date(event.endDate);
-  
+
   const dateString = startDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  const timeString = event.allDay 
-    ? 'All Day' 
+  const timeString = event.allDay
+    ? 'All Day'
     : `${startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
 
   const handleGoogleClick = () => {
@@ -36,7 +31,7 @@ const EventPreview: React.FC<EventPreviewProps> = ({ event, onReset }) => {
     <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-xl animate-fade-in-up border border-slate-100">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-          <i data-feather="check-circle" className="text-green-500 w-5 h-5"></i>
+          <CheckCircle className="text-green-500 w-5 h-5" />
           Event Ready
         </h2>
         <button onClick={onReset} className="text-sm text-slate-400 hover:text-slate-600 transition-colors">
@@ -47,25 +42,25 @@ const EventPreview: React.FC<EventPreviewProps> = ({ event, onReset }) => {
       <div className="bg-slate-50 rounded-xl p-5 border border-slate-100 mb-8 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-1 h-full bg-primary-500"></div>
         <h3 className="text-xl font-bold text-slate-900 mb-1">{event.title}</h3>
-        
+
         <div className="flex flex-col gap-2 mt-4 text-slate-600 text-sm">
           <div className="flex items-start gap-3">
-            <i data-feather="calendar" className="w-4 h-4 mt-0.5 text-primary-500 shrink-0"></i>
+            <Calendar className="w-4 h-4 mt-0.5 text-primary-500 shrink-0" />
             <span>{dateString}</span>
           </div>
           <div className="flex items-start gap-3">
-             <i data-feather="clock" className="w-4 h-4 mt-0.5 text-primary-500 shrink-0"></i>
+            <Clock className="w-4 h-4 mt-0.5 text-primary-500 shrink-0" />
             <span>{timeString}</span>
           </div>
           {event.location && (
             <div className="flex items-start gap-3">
-               <i data-feather="map-pin" className="w-4 h-4 mt-0.5 text-primary-500 shrink-0"></i>
+              <MapPin className="w-4 h-4 mt-0.5 text-primary-500 shrink-0" />
               <span>{event.location}</span>
             </div>
           )}
           {event.description && (
             <div className="flex items-start gap-3 mt-1">
-               <i data-feather="align-left" className="w-4 h-4 mt-0.5 text-primary-500 shrink-0"></i>
+              <AlignLeft className="w-4 h-4 mt-0.5 text-primary-500 shrink-0" />
               <span className="line-clamp-3">{event.description}</span>
             </div>
           )}
