@@ -1,0 +1,5 @@
+{
+  "name": "Magic Calendar",
+  "description": "Convert natural language or ICS files into instant Google or Apple Calendar events using AI.",
+  "requestFramePermissions": []
+}
