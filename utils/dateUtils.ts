@@ -71,34 +71,44 @@ END:VCALENDAR`;
 
 /**
  * Handles adding the event to Apple Calendar (or other ICS supports).
- * On iOS, it attempts to open the event directly.
+ * On iOS, it attempts to open the event directly in the native Calendar app.
  * On Desktop/Android, it downloads the .ics file.
  */
 export const addToAppleCalendar = (event: CalendarEvent) => {
   const content = generateICSFileContent(event);
   const fileName = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
-  
+
   // Detect iOS (iPhone, iPad, iPod)
   // Note: Modern iPads often report as MacIntel, so we check maxTouchPoints
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+  // Create Blob for all platforms
+  const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  // Create temporary link element
+  const link = document.createElement('a');
+  link.href = url;
+
   if (isIOS) {
-    // On iOS, downloading a file often sends it to the "Files" app, which is a poor UX.
-    // Navigating directly to a text/calendar Data URI typically triggers the native 
-    // "Add to Calendar" modal directly.
-    const dataUrl = `data:text/calendar;charset=utf-8,${encodeURIComponent(content)}`;
-    window.location.href = dataUrl;
+    // On iOS, using a Blob URL with target="_blank" and without download attribute
+    // prompts Safari to open the ICS file directly in the Calendar app
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    // Don't set download attribute for iOS - this allows the system to handle it
   } else {
-    // For Desktop and Android, downloading the ICS file is the standard and reliable behavior.
-    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = url;
+    // For Desktop and Android, set download attribute to trigger file download
     link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   }
+
+  // Programmatically click the link
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up: remove link and revoke object URL after a short delay
+  setTimeout(() => {
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, 100);
 };
